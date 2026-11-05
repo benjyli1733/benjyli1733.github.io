@@ -28,11 +28,11 @@
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:15px;line-height:1.5;
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 48px}
-.wrap{max-width:1280px;margin:0 auto;display:flex;flex-direction:column;gap:24px}
+.wrap{max-width:1440px;margin:0 auto;display:flex;flex-direction:column;gap:24px}
 header h1{font-family:var(--display);font-stretch:125%;font-weight:800;font-size:clamp(28px,5vw,44px);line-height:1;margin:0;letter-spacing:-.01em;text-wrap:balance}
 header p{margin:8px 0 0;color:var(--muted);max-width:60ch}
-.layout{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(320px,1fr);gap:28px;align-items:start}
-@media (max-width:820px){.layout{grid-template-columns:1fr}}
+.layout{display:grid;grid-template-columns:minmax(0,2.1fr) minmax(300px,.9fr);gap:28px;align-items:start}
+@media (max-width:900px){.layout{grid-template-columns:1fr}}
 
 .stage{display:flex;flex-direction:column;gap:12px;min-width:0}
 .tabs{display:flex;gap:4px;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:4px;align-self:flex-start}
@@ -41,23 +41,14 @@ header p{margin:8px 0 0;color:var(--muted);max-width:60ch}
 .tabs button:focus-visible{outline:2px solid var(--sel);outline-offset:2px}
 .tabs .n{font-family:var(--mono);font-size:12px;opacity:.75;margin-left:6px}
 
-.shirt{position:relative;width:100%;max-width:800px;aspect-ratio:400/440;margin:0 auto}
-.shirt svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
-.shirt .body{fill:var(--shirt);stroke:var(--shirt-edge);stroke-width:1.5}
-.shirt .inner-neck{fill:var(--shirt-edge)}
-.shirt .collar{fill:var(--shirt);stroke:var(--shirt-edge);stroke-width:1}
+.shirt{position:relative;width:100%;max-width:1040px;aspect-ratio:400/412;margin:0 auto}
+.shirt svg{position:absolute;inset:0;width:100%;height:100%}
+.shirt .body{fill:var(--shirt);stroke:var(--shirt-edge);stroke-width:2}
 .shirt .seam{fill:none;stroke:var(--shirt-edge);stroke-width:1.5;opacity:.8}
-.shirt .stitch{fill:none;stroke:#fff;stroke-opacity:.2;stroke-width:1;stroke-dasharray:3 2.5}
-.shirt .knit{mix-blend-mode:overlay;opacity:.12}
-/* curved-surface shading laid over the print area so squares and photos follow the shirt's form */
-.grid::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:4;border-radius:4px;
-  background:linear-gradient(90deg,rgba(0,0,0,.22),rgba(0,0,0,.05) 22%,rgba(255,255,255,.08) 48%,rgba(0,0,0,.04) 74%,rgba(0,0,0,.24)),
-             radial-gradient(ellipse 60% 35% at 42% 22%,rgba(255,255,255,.08),transparent 70%)}
-.side-label{position:absolute;left:0;right:0;bottom:2%;text-align:center;font:500 11px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
 
-/* print area: x 110..290, y 92..332 in a 400x440 viewBox */
-.grid{position:absolute;left:27.5%;top:20.909%;width:45%;height:54.545%;
-  display:grid;grid-template-columns:repeat(6,1fr);grid-template-rows:repeat(8,1fr);gap:clamp(3px,1.1vw,6px);
+/* print area fills most of the torso: x 90..310, y 68..404 in a viewBox cropped to y 22..434 */
+.grid{position:absolute;left:22.5%;top:11.165%;width:55%;height:81.553%;
+  display:grid;grid-template-columns:repeat(6,1fr);grid-template-rows:repeat(8,1fr);gap:clamp(2px,.5vw,4px);
   touch-action:none;user-select:none;-webkit-user-select:none}
 .cell{border:1px dashed rgba(255,255,255,.28);background:var(--print);border-radius:2px;padding:0;cursor:crosshair;
   font:500 9px var(--mono);color:rgba(255,255,255,.4);display:flex;align-items:flex-end;justify-content:flex-start;padding:2px 3px}
@@ -70,11 +61,12 @@ header p{margin:8px 0 0;color:var(--muted);max-width:60ch}
 .sel.bad{border-color:var(--bad);background-color:rgba(229,72,77,.35)}
 .sel.has-img{background-color:transparent}
 
-.legend{display:flex;flex-wrap:wrap;gap:14px;justify-content:center;font-size:13px;color:var(--muted)}
-.legend span{display:inline-flex;align-items:center;gap:6px}
-.sw{width:14px;height:14px;border-radius:3px;display:inline-block}
+.legend{display:flex;flex-wrap:wrap;gap:10px 28px;justify-content:center;font-size:16px;color:var(--fg)}
+.legend span{display:inline-flex;align-items:center;gap:8px}
+.legend b{font-family:var(--mono);font-weight:500;font-variant-numeric:tabular-nums;color:var(--muted)}
+.sw{width:20px;height:20px;border-radius:4px;display:inline-block}
 .sw.free{background:var(--print);border:1px dashed var(--muted)}
-.sw.taken{background:repeating-linear-gradient(45deg,var(--muted) 0 2px,transparent 2px 5px);border:1px solid var(--muted)}
+.sw.taken{background:linear-gradient(135deg,#e4e6ea,#6b6f78);border:1px solid var(--muted)}
 .sw.yours{background:var(--sel)}
 
 .panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:22px;display:flex;flex-direction:column;gap:18px;min-width:0}
@@ -137,89 +129,16 @@ input[type=text]:focus-visible{outline:2px solid var(--shirt);outline-offset:1px
         <button id="tab-back" role="tab" aria-selected="false" data-side="back">Back<span class="n" id="n-back"></span></button>
       </div>
       <div class="shirt">
-        <svg viewBox="0 0 400 440" aria-hidden="true">
-          <defs>
-            <filter id="lift" x="-15%" y="-15%" width="130%" height="135%">
-              <feDropShadow dx="0" dy="12" stdDeviation="10" flood-color="#000" flood-opacity=".3"/>
-            </filter>
-            <filter id="soft" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="3.5"/></filter>
-            <filter id="knit-noise" x="0" y="0" width="100%" height="100%">
-              <feTurbulence type="fractalNoise" baseFrequency="1.1" numOctaves="2" stitchTiles="stitch"/>
-              <feColorMatrix type="saturate" values="0"/>
-            </filter>
-            <clipPath id="clip-shirt"><use href="#shirt-path"/></clipPath>
-            <!-- torso curves away at the sides: dark edges, lit centre -->
-            <linearGradient id="g-torso" gradientUnits="userSpaceOnUse" x1="78" y1="0" x2="322" y2="0">
-              <stop offset="0" stop-color="#000" stop-opacity=".45"/>
-              <stop offset=".12" stop-color="#000" stop-opacity=".2"/>
-              <stop offset=".36" stop-color="#fff" stop-opacity=".06"/>
-              <stop offset=".48" stop-color="#fff" stop-opacity=".11"/>
-              <stop offset=".64" stop-color="#fff" stop-opacity=".04"/>
-              <stop offset=".88" stop-color="#000" stop-opacity=".22"/>
-              <stop offset="1" stop-color="#000" stop-opacity=".48"/>
-            </linearGradient>
-            <linearGradient id="g-vert" gradientUnits="userSpaceOnUse" x1="0" y1="30" x2="0" y2="432">
-              <stop offset="0" stop-color="#fff" stop-opacity=".1"/>
-              <stop offset=".22" stop-color="#fff" stop-opacity="0"/>
-              <stop offset=".86" stop-color="#000" stop-opacity="0"/>
-              <stop offset="1" stop-color="#000" stop-opacity=".25"/>
-            </linearGradient>
-            <radialGradient id="g-chest" gradientUnits="userSpaceOnUse" cx="180" cy="150" r="110">
-              <stop offset="0" stop-color="#fff" stop-opacity=".1"/>
-              <stop offset="1" stop-color="#fff" stop-opacity="0"/>
-            </radialGradient>
-            <!-- sleeves: lit on top, shadowed underneath -->
-            <linearGradient id="g-sleeve-l" gradientUnits="userSpaceOnUse" x1="39" y1="86" x2="64" y2="150">
-              <stop offset="0" stop-color="#fff" stop-opacity=".12"/>
-              <stop offset=".45" stop-color="#000" stop-opacity="0"/>
-              <stop offset="1" stop-color="#000" stop-opacity=".42"/>
-            </linearGradient>
-            <linearGradient id="g-sleeve-r" gradientUnits="userSpaceOnUse" x1="361" y1="86" x2="336" y2="150">
-              <stop offset="0" stop-color="#fff" stop-opacity=".08"/>
-              <stop offset=".45" stop-color="#000" stop-opacity="0"/>
-              <stop offset="1" stop-color="#000" stop-opacity=".48"/>
-            </linearGradient>
-          </defs>
-          <path class="inner-neck" id="inner-neck" d=""/>
-          <path class="body" id="shirt-path" d="" filter="url(#lift)"/>
-          <g clip-path="url(#clip-shirt)">
-            <path id="torso-shade" fill="url(#g-torso)" d=""/>
-            <path id="torso-vert" fill="url(#g-vert)" d=""/>
-            <circle cx="180" cy="150" r="110" fill="url(#g-chest)"/>
-            <path fill="url(#g-sleeve-l)" d="M70 52 L8 120 L50 160 L78 140 Q82 96 70 52 Z"/>
-            <path fill="url(#g-sleeve-r)" d="M330 52 L392 120 L350 160 L322 140 Q318 96 330 52 Z"/>
-            <g filter="url(#soft)" fill="none" stroke-linecap="round">
-              <!-- folds: shadow + highlight pairs -->
-              <path stroke="#000" stroke-opacity=".32" stroke-width="7" d="M80 150 Q112 176 130 222"/>
-              <path stroke="#fff" stroke-opacity=".09" stroke-width="5" d="M90 144 Q120 168 140 210"/>
-              <path stroke="#000" stroke-opacity=".34" stroke-width="7" d="M320 150 Q288 176 270 222"/>
-              <path stroke="#fff" stroke-opacity=".07" stroke-width="5" d="M310 144 Q280 168 260 210"/>
-              <path stroke="#000" stroke-opacity=".3" stroke-width="6" d="M44 98 Q56 120 60 152"/>
-              <path stroke="#000" stroke-opacity=".3" stroke-width="6" d="M356 98 Q344 120 340 152"/>
-              <path stroke="#000" stroke-opacity=".22" stroke-width="6" d="M118 424 Q126 396 116 364"/>
-              <path stroke="#fff" stroke-opacity=".07" stroke-width="5" d="M128 424 Q136 398 128 368"/>
-              <path stroke="#000" stroke-opacity=".2" stroke-width="6" d="M268 426 Q276 400 286 374"/>
-              <path stroke="#000" stroke-opacity=".14" stroke-width="5" d="M200 430 Q195 408 206 386"/>
-              <path stroke="#000" stroke-opacity=".25" stroke-width="10" d="M70 56 Q86 98 80 140"/>
-              <path stroke="#000" stroke-opacity=".25" stroke-width="10" d="M330 56 Q314 98 320 140"/>
-            </g>
-            <rect class="knit" x="0" y="0" width="400" height="440" filter="url(#knit-noise)"/>
-          </g>
-          <path class="collar" id="collar-band" d=""/>
+        <svg viewBox="0 22 400 412" aria-hidden="true">
+          <path class="body" id="shirt-path" d=""/>
           <path class="seam" id="collar-path" d=""/>
-          <path class="stitch" d="M70 52 Q82 96 78 140"/>
-          <path class="stitch" d="M330 52 Q318 96 322 140"/>
-          <path class="stitch" d="M13 115 L55 155"/>
-          <path class="stitch" d="M387 115 L345 155"/>
-          <path class="stitch" d="M82 411 Q200 423 318 411"/>
         </svg>
         <div class="grid" id="grid" role="grid" aria-label="Photo spaces"></div>
-        <div class="side-label" id="side-label">Front · 48 spaces</div>
       </div>
-      <div class="legend">
-        <span><i class="sw free"></i>Free</span>
-        <span><i class="sw taken"></i>Taken</span>
-        <span><i class="sw yours"></i>Your selection</span>
+      <div class="legend" aria-live="polite">
+        <span><i class="sw free"></i>Free <b id="lg-free">48</b></span>
+        <span><i class="sw taken"></i>Taken <b id="lg-taken">0</b></span>
+        <span><i class="sw yours"></i>Your selection <b id="lg-sel">0</b></span>
       </div>
     </section>
 
@@ -285,10 +204,6 @@ const SHIRT_FRONT="M140 30 Q200 70 260 30 L330 52 L392 120 L350 160 L322 140 L32
 const COLLAR_FRONT="M140 30 Q200 82 260 30";
 const SHIRT_BACK="M140 30 Q200 44 260 30 L330 52 L392 120 L350 160 L322 140 L322 420 Q200 432 78 420 L78 140 L50 160 L8 120 L70 52 Z";
 const COLLAR_BACK="M140 30 Q200 52 260 30";
-/* neckline depth (quadratic control y) and collar-seam depth per side */
-const NECK={front:{n:70,s:82},back:{n:44,s:52}};
-const torsoPath=n=>`M70 52 L140 30 Q200 ${n} 260 30 L330 52 Q318 96 322 140 L322 420 Q200 432 78 420 L78 140 Q82 96 70 52 Z`;
-const collarBand=k=>`M140 30 Q200 ${k.n} 260 30 L262 33 Q200 ${k.s+2} 138 33 Z`;
 
 const S={side:"front",anchor:null,sel:null,dragging:false,file:null,fileUrl:null,spaces:[],sb:null,ready:false,busy:false,agreedKey:""};
 
@@ -330,16 +245,12 @@ function render(){
   const side=S.side;
   $("shirt-path").setAttribute("d",side==="front"?SHIRT_FRONT:SHIRT_BACK);
   $("collar-path").setAttribute("d",side==="front"?COLLAR_FRONT:COLLAR_BACK);
-  const k=NECK[side];
-  $("torso-shade").setAttribute("d",torsoPath(k.n));
-  $("torso-vert").setAttribute("d",torsoPath(k.n));
-  $("collar-band").setAttribute("d",collarBand(k));
-  /* on the front you can see the inside of the back neck through the opening */
-  $("inner-neck").setAttribute("d",side==="front"?"M140 30 Q200 46 260 30 Q200 70 140 30 Z":"");
   document.querySelectorAll(".tabs button").forEach(b=>b.setAttribute("aria-selected",b.dataset.side===side));
   for(const s of ["front","back"]) $("n-"+s).textContent=(COLS*ROWS-occupied(s).size)+" free";
   const occ=occupied(side);
-  $("side-label").textContent=(side==="front"?"Front":"Back")+" · "+(COLS*ROWS-occ.size)+" of 48 free";
+  $("lg-free").textContent=COLS*ROWS-occ.size;
+  $("lg-taken").textContent=occ.size;
+  $("lg-sel").textContent=S.sel&&S.sel.side===side?S.sel.w*S.sel.h:0;
   grid.querySelectorAll(".cell").forEach(b=>{
     const t=occ.has(b.dataset.c+","+b.dataset.r);
     b.classList.toggle("taken",t);
