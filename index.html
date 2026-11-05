@@ -15,8 +15,8 @@
   --display:"Archivo","Arial Black",system-ui,sans-serif;
   --body:"Instrument Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
   --mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
-  /* on-screen golden tint for the black and white photos (the uploaded files stay neutral) */
-  --gold:url(#gold-tone);
+  /* photos are shown in black and white */
+  --gold:grayscale(1);
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --bg:#0f131c; --surface:#171c28; --fg:#e9ecf3; --muted:#9aa3b8; --line:#2a3142;
@@ -98,6 +98,10 @@ input[type=text]:focus-visible{outline:2px solid var(--shirt);outline-offset:1px
 .agree.off{opacity:.55;cursor:not-allowed}
 .agree input{width:18px;height:18px;margin:2px 0 0;flex:none;accent-color:var(--shirt)}
 .agree b{font-family:var(--mono);font-weight:500;font-variant-numeric:tabular-nums}
+.bank{margin:0;display:flex;flex-wrap:wrap;gap:10px 24px;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:12px}
+.bank div{min-width:0}
+.bank dt{font-size:12px;color:var(--muted)}
+.bank dd{margin:0;font-family:var(--mono);font-size:14px;font-variant-numeric:tabular-nums;user-select:all;-webkit-user-select:all}
 .msg{font-size:14px;margin:0;min-height:1.5em}
 .msg.err{color:var(--bad)} .msg.ok{color:var(--ok)}
 .hint{font-size:13px;color:var(--muted);margin:0}
@@ -119,17 +123,6 @@ input[type=text]:focus-visible{outline:2px solid var(--shirt);outline-offset:1px
 <style>body{margin:0} img{max-width:100%} [hidden]{display:none!important}</style>
 </head>
 <body>
-<!-- gold duotone: shadows near-black, midtones #A57C00, highlights warm cream -->
-<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
-  <filter id="gold-tone" color-interpolation-filters="sRGB">
-    <feColorMatrix type="saturate" values="0"/>
-    <feComponentTransfer>
-      <feFuncR type="table" tableValues="0.06 0.647 1"/>
-      <feFuncG type="table" tableValues="0.04 0.486 0.93"/>
-      <feFuncB type="table" tableValues="0 0 0.72"/>
-    </feComponentTransfer>
-  </filter>
-</svg>
 <div class="wrap">
   <header>
     <h1>Get your photo on the shirt</h1>
@@ -193,7 +186,12 @@ input[type=text]:focus-visible{outline:2px solid var(--shirt);outline-offset:1px
       </div>
 
       <div class="step">
-        <span class="lbl">4. Agree to pay <small>(£5 per space)</small></span>
+        <span class="lbl">4. Agree to pay <small>(£5 per space, by bank transfer)</small></span>
+        <dl class="bank" aria-label="Bank details for payment">
+          <div><dt>Account name</dt><dd>OXFORD UNIVERSITY</dd></div>
+          <div><dt>Sort code</dt><dd>20-65-20</dd></div>
+          <div><dt>Account number</dt><dd>53752402</dd></div>
+        </dl>
         <label class="agree off" id="agree-wrap" for="agree">
           <input type="checkbox" id="agree" disabled>
           <span id="agree-text">Select your spaces to see the price.</span>
@@ -304,7 +302,7 @@ function renderAgree(){
   box.disabled=false;wrap.classList.remove("off");txt.innerHTML="";
   txt.append("I agree to pay ");
   const b=document.createElement("b");b.textContent=gbp(n*PRICE);txt.append(b);
-  txt.append(` (${n} space${n>1?"s":""} × ${gbp(PRICE)}) for this reservation. My spaces are held once I reserve, and I'll pay the seller directly.`);
+  txt.append(` (${n} space${n>1?"s":""} × ${gbp(PRICE)}) for this reservation. My spaces are held once I reserve, and I'll pay by bank transfer to OXFORD UNIVERSITY, sort code 20-65-20, account 53752402.`);
 }
 function validate(){
   const name=$("fullname").value.trim();
