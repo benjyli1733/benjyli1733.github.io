@@ -1,0 +1,472 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Photo Tee Spaces</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@125,800&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: shirt stage on the left, booking form on the right; stacks on phones. */
+:root{
+  --bg:#eef0f4; --surface:#ffffff; --fg:#151b2b; --muted:#5b6478; --line:#d5d9e2;
+  --shirt:#1f2a44; --shirt-edge:#141c30; --print:#2a3656;
+  --sel:#ffd23f; --sel-ink:#151b2b; --bad:#e5484d; --ok:#2f9e6f;
+  --display:"Archivo","Arial Black",system-ui,sans-serif;
+  --body:"Instrument Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0f131c; --surface:#171c28; --fg:#e9ecf3; --muted:#9aa3b8; --line:#2a3142;
+  --shirt:#2b3a5e; --shirt-edge:#3b4c75; --print:#34446b;
+  --sel:#ffd23f; --sel-ink:#151b2b; --bad:#ff6b6f; --ok:#45c08c; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f131c; --surface:#171c28; --fg:#e9ecf3; --muted:#9aa3b8; --line:#2a3142;
+  --shirt:#2b3a5e; --shirt-edge:#3b4c75; --print:#34446b;
+  --sel:#ffd23f; --sel-ink:#151b2b; --bad:#ff6b6f; --ok:#45c08c; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:15px;line-height:1.5;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 48px}
+.wrap{max-width:1080px;margin:0 auto;display:flex;flex-direction:column;gap:24px}
+header h1{font-family:var(--display);font-stretch:125%;font-weight:800;font-size:clamp(28px,5vw,44px);line-height:1;margin:0;letter-spacing:-.01em;text-wrap:balance}
+header p{margin:8px 0 0;color:var(--muted);max-width:60ch}
+.layout{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:24px;align-items:start}
+@media (max-width:820px){.layout{grid-template-columns:1fr}}
+
+.stage{display:flex;flex-direction:column;gap:12px;min-width:0}
+.tabs{display:flex;gap:4px;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:4px;align-self:flex-start}
+.tabs button{font:600 14px var(--body);border:0;background:transparent;color:var(--muted);padding:8px 18px;border-radius:999px;cursor:pointer}
+.tabs button[aria-selected="true"]{background:var(--shirt);color:#fff}
+.tabs button:focus-visible{outline:2px solid var(--sel);outline-offset:2px}
+.tabs .n{font-family:var(--mono);font-size:12px;opacity:.75;margin-left:6px}
+
+.shirt{position:relative;width:100%;max-width:560px;aspect-ratio:400/440;margin:0 auto}
+.shirt svg{position:absolute;inset:0;width:100%;height:100%}
+.shirt .body{fill:var(--shirt);stroke:var(--shirt-edge);stroke-width:2}
+.shirt .seam{fill:none;stroke:var(--shirt-edge);stroke-width:1.5;opacity:.8}
+.side-label{position:absolute;left:0;right:0;bottom:2%;text-align:center;font:500 11px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+
+/* print area: x 110..290, y 92..332 in a 400x440 viewBox */
+.grid{position:absolute;left:27.5%;top:20.909%;width:45%;height:54.545%;
+  display:grid;grid-template-columns:repeat(6,1fr);grid-template-rows:repeat(8,1fr);gap:clamp(3px,1.1vw,6px);
+  touch-action:none;user-select:none;-webkit-user-select:none}
+.cell{border:1px dashed rgba(255,255,255,.28);background:var(--print);border-radius:2px;padding:0;cursor:crosshair;
+  font:500 9px var(--mono);color:rgba(255,255,255,.4);display:flex;align-items:flex-end;justify-content:flex-start;padding:2px 3px}
+.cell:hover{border-color:rgba(255,255,255,.7)}
+.cell:focus-visible{outline:2px solid var(--sel);outline-offset:1px;z-index:3}
+.cell.taken{cursor:not-allowed;background:repeating-linear-gradient(45deg,rgba(255,255,255,.08) 0 4px,transparent 4px 8px),var(--print)}
+.photo{z-index:1;border-radius:2px;overflow:hidden;pointer-events:none;background:#c8ccd6 center/cover no-repeat;box-shadow:0 0 0 1px rgba(0,0,0,.25)}
+.photo.mine{box-shadow:0 0 0 2px var(--sel)}
+.sel{z-index:2;pointer-events:none;border:2px solid var(--sel);background:rgba(255,210,63,.28) center/cover no-repeat;border-radius:2px}
+.sel.bad{border-color:var(--bad);background-color:rgba(229,72,77,.35)}
+.sel.has-img{background-color:transparent}
+
+.legend{display:flex;flex-wrap:wrap;gap:14px;justify-content:center;font-size:13px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.sw{width:14px;height:14px;border-radius:3px;display:inline-block}
+.sw.free{background:var(--print);border:1px dashed var(--muted)}
+.sw.taken{background:repeating-linear-gradient(45deg,var(--muted) 0 2px,transparent 2px 5px);border:1px solid var(--muted)}
+.sw.yours{background:var(--sel)}
+
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:22px;display:flex;flex-direction:column;gap:18px;min-width:0}
+.panel h2{font-family:var(--display);font-stretch:125%;font-weight:800;font-size:20px;margin:0}
+.step{display:flex;flex-direction:column;gap:8px}
+.step > label,.step .lbl{font-weight:600;font-size:14px}
+.lbl small{font-weight:400;color:var(--muted)}
+.readout{font-family:var(--mono);font-size:13px;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px 12px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-variant-numeric:tabular-nums}
+.readout.empty{color:var(--muted)}
+.readout.bad{border-color:var(--bad);color:var(--bad)}
+input[type=text]{font:inherit;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px 12px;width:100%}
+input[type=text]:focus-visible{outline:2px solid var(--shirt);outline-offset:1px;border-color:transparent}
+.drop{border:1.5px dashed var(--line);border-radius:10px;padding:16px;display:flex;gap:14px;align-items:center;cursor:pointer;background:var(--bg)}
+.drop:hover,.drop.over{border-color:var(--fg)}
+.drop:focus-within{outline:2px solid var(--shirt);outline-offset:1px}
+.drop input{position:absolute;opacity:0;width:1px;height:1px}
+.thumb{width:56px;height:56px;border-radius:8px;background:var(--line) center/cover no-repeat;flex:none}
+.drop .t{min-width:0;font-size:14px}
+.drop .t b{display:block;font-weight:600}
+.drop .t span{color:var(--muted);font-size:13px;overflow-wrap:anywhere}
+.btn{font:600 15px var(--body);border:0;border-radius:10px;padding:13px 18px;cursor:pointer;background:var(--shirt);color:#fff}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn:focus-visible{outline:2px solid var(--sel);outline-offset:2px}
+.btn.ghost{background:transparent;color:var(--muted);border:1px solid var(--line);padding:6px 12px;font-size:13px}
+.agree{display:flex;gap:10px;align-items:flex-start;font-size:14px;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:12px;cursor:pointer}
+.agree.off{opacity:.55;cursor:not-allowed}
+.agree input{width:18px;height:18px;margin:2px 0 0;flex:none;accent-color:var(--shirt)}
+.agree b{font-family:var(--mono);font-weight:500;font-variant-numeric:tabular-nums}
+.msg{font-size:14px;margin:0;min-height:1.5em}
+.msg.err{color:var(--bad)} .msg.ok{color:var(--ok)}
+.hint{font-size:13px;color:var(--muted);margin:0}
+
+.mine-list,.orders{display:flex;flex-direction:column;gap:8px;margin:0;padding:0;list-style:none}
+.mine-list li,.orders li{display:flex;gap:10px;align-items:center;font-size:14px;border-top:1px solid var(--line);padding-top:8px}
+.mine-list .thumb,.orders .thumb{width:36px;height:36px;border-radius:6px}
+.mine-list .meta,.orders .meta{flex:1;min-width:0}
+.mono{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.banner{font-size:14px;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin:0}
+@media (prefers-reduced-motion:no-preference){.sel{transition:background-color .12s}}
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Get your photo on the shirt</h1>
+    <p>Each side of the tee has a 6&nbsp;×&nbsp;8 grid. Drag across the free squares to pick a rectangle, add your photo and full name, and reserve it. A bigger rectangle means a bigger photo.</p>
+  </header>
+
+  <div class="layout">
+    <section class="stage" aria-label="Shirt">
+      <div class="tabs" role="tablist">
+        <button id="tab-front" role="tab" aria-selected="true" data-side="front">Front<span class="n" id="n-front"></span></button>
+        <button id="tab-back" role="tab" aria-selected="false" data-side="back">Back<span class="n" id="n-back"></span></button>
+      </div>
+      <div class="shirt">
+        <svg viewBox="0 0 400 440" aria-hidden="true">
+          <path class="body" id="shirt-path" d=""/>
+          <path class="seam" id="collar-path" d=""/>
+        </svg>
+        <div class="grid" id="grid" role="grid" aria-label="Photo spaces"></div>
+        <div class="side-label" id="side-label">Front · 48 spaces</div>
+      </div>
+      <div class="legend">
+        <span><i class="sw free"></i>Free</span>
+        <span><i class="sw taken"></i>Taken</span>
+        <span><i class="sw yours"></i>Your selection</span>
+      </div>
+    </section>
+
+    <aside class="panel">
+      <h2>Reserve your spaces</h2>
+      <p class="banner" id="banner" hidden></p>
+
+      <div class="step">
+        <span class="lbl">1. Choose spaces <small>(drag on the shirt; tap a square, then Shift-tap or drag to stretch)</small></span>
+        <div class="readout empty" id="readout">No spaces selected</div>
+      </div>
+
+      <div class="step">
+        <span class="lbl">2. Upload your photo <small>(JPG, PNG or WebP, up to 20 MB)</small></span>
+        <label class="drop" id="drop" for="photo">
+          <input type="file" id="photo" accept="image/jpeg,image/png,image/webp,image/heic">
+          <span class="thumb" id="thumb"></span>
+          <span class="t"><b id="drop-title">Choose a photo</b><span id="drop-sub">or drop it here</span></span>
+        </label>
+      </div>
+
+      <div class="step">
+        <label for="fullname">3. Your full name</label>
+        <input type="text" id="fullname" autocomplete="name" placeholder="First and last name" maxlength="80">
+      </div>
+
+      <div class="step">
+        <span class="lbl">4. Agree to pay <small>(£5 per space)</small></span>
+        <label class="agree off" id="agree-wrap" for="agree">
+          <input type="checkbox" id="agree" disabled>
+          <span id="agree-text">Select your spaces to see the price.</span>
+        </label>
+      </div>
+
+      <button class="btn" id="submit" disabled>Reserve spaces</button>
+      <p class="msg" id="msg" role="status"></p>
+
+      <div class="step" id="mine-wrap" hidden>
+        <span class="lbl">Your reservations</span>
+        <ul class="mine-list" id="mine"></ul>
+      </div>
+
+      <div class="step" id="owner-wrap" hidden>
+        <span class="lbl">All reservations <small>(only you see this list)</small></span>
+        <ul class="orders" id="orders"></ul>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<script>
+const COLS=6, ROWS=8, LETTERS="ABCDEF";
+const SHIRT_FRONT="M140 30 Q200 70 260 30 L330 52 L392 120 L350 160 L322 140 L322 420 Q200 432 78 420 L78 140 L50 160 L8 120 L70 52 Z";
+const COLLAR_FRONT="M140 30 Q200 82 260 30";
+const SHIRT_BACK="M140 30 Q200 44 260 30 L330 52 L392 120 L350 160 L322 140 L322 420 Q200 432 78 420 L78 140 L50 160 L8 120 L70 52 Z";
+const COLLAR_BACK="M140 30 Q200 52 260 30";
+
+const S={side:"front",anchor:null,sel:null,dragging:false,file:null,fileUrl:null,
+  orders:{},uid:null,isOwner:false,db:null,assets:null,busy:false};
+
+const $=id=>document.getElementById(id);
+const grid=$("grid");
+const label=(c,r)=>LETTERS[c]+(r+1);
+const rectLabel=s=>s.w===1&&s.h===1?label(s.c,s.r):label(s.c,s.r)+"–"+label(s.c+s.w-1,s.r+s.h-1);
+const imgUrl=id=>"/_blob/"+encodeURIComponent(id);
+const PRICE=5;
+const gbp=n=>"£"+n.toLocaleString("en-GB");
+const selKey=s=>s?[s.side,s.c,s.r,s.w,s.h].join(":"):"";
+S.agreedKey="";
+
+function allPlacements(){
+  const out=[];
+  for(const [uid,doc] of Object.entries(S.orders))
+    for(const p of (doc.placements||[])) out.push({...p,uid});
+  return out;
+}
+function occupied(side,list=allPlacements()){
+  const m=new Set();
+  for(const p of list) if(p.side===side)
+    for(let r=p.r;r<p.r+p.h;r++) for(let c=p.c;c<p.c+p.w;c++) m.add(c+","+r);
+  return m;
+}
+function rectFrom(a,b){
+  const c=Math.min(a.c,b.c), r=Math.min(a.r,b.r);
+  return {c,r,w:Math.abs(a.c-b.c)+1,h:Math.abs(a.r-b.r)+1};
+}
+function clashes(rect,side,list){
+  const occ=occupied(side,list);
+  for(let r=rect.r;r<rect.r+rect.h;r++) for(let c=rect.c;c<rect.c+rect.w;c++) if(occ.has(c+","+r)) return true;
+  return false;
+}
+
+/* ---------- render ---------- */
+function buildCells(){
+  grid.innerHTML="";
+  for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++){
+    const b=document.createElement("button");
+    b.type="button";b.className="cell";b.dataset.c=c;b.dataset.r=r;
+    b.style.gridArea=`${r+1}/${c+1}`;b.textContent=label(c,r);
+    b.setAttribute("aria-label","Space "+label(c,r));
+    grid.appendChild(b);
+  }
+}
+function render(){
+  const side=S.side;
+  $("shirt-path").setAttribute("d",side==="front"?SHIRT_FRONT:SHIRT_BACK);
+  $("collar-path").setAttribute("d",side==="front"?COLLAR_FRONT:COLLAR_BACK);
+  document.querySelectorAll(".tabs button").forEach(b=>b.setAttribute("aria-selected",b.dataset.side===side));
+  const list=allPlacements();
+  for(const s of ["front","back"]) $("n-"+s).textContent=(COLS*ROWS-occupied(s,list).size)+" free";
+  const occ=occupied(side,list);
+  $("side-label").textContent=(side==="front"?"Front":"Back")+" · "+(COLS*ROWS-occ.size)+" of 48 free";
+  grid.querySelectorAll(".cell").forEach(b=>{
+    const t=occ.has(b.dataset.c+","+b.dataset.r);
+    b.classList.toggle("taken",t);
+    b.setAttribute("aria-label","Space "+label(+b.dataset.c,+b.dataset.r)+(t?", taken":", free"));
+  });
+  grid.querySelectorAll(".photo,.sel").forEach(e=>e.remove());
+  for(const p of list) if(p.side===side){
+    const d=document.createElement("div");
+    d.className="photo"+(p.uid===S.uid?" mine":"");
+    d.style.gridArea=`${p.r+1}/${p.c+1}/span ${p.h}/span ${p.w}`;
+    d.style.backgroundImage=`url("${imgUrl(p.asset)}")`;
+    grid.appendChild(d);
+  }
+  const ro=$("readout");
+  if(S.sel && S.sel.side===side){
+    const bad=clashes(S.sel,side,list);
+    const d=document.createElement("div");
+    d.className="sel"+(bad?" bad":"")+(S.fileUrl&&!bad?" has-img":"");
+    d.style.gridArea=`${S.sel.r+1}/${S.sel.c+1}/span ${S.sel.h}/span ${S.sel.w}`;
+    if(S.fileUrl&&!bad) d.style.backgroundImage=`url("${S.fileUrl}")`;
+    grid.appendChild(d);
+  }
+  if(S.sel){
+    const bad=clashes(S.sel,S.sel.side,list);
+    const n=S.sel.w*S.sel.h;
+    ro.className="readout"+(bad?" bad":"");
+    ro.innerHTML="";
+    const a=document.createElement("span");a.textContent=(S.sel.side==="front"?"Front ":"Back ")+rectLabel(S.sel);
+    const b=document.createElement("span");b.textContent=bad?"Overlaps a taken space":`${n} space${n>1?"s":""} × ${gbp(PRICE)} = ${gbp(n*PRICE)}`;
+    ro.append(a,b);
+  } else {ro.className="readout empty";ro.textContent="No spaces selected";}
+  renderAgree();renderMine();renderOwner();validate();
+}
+function renderAgree(){
+  const box=$("agree"),wrap=$("agree-wrap"),txt=$("agree-text");
+  if(selKey(S.sel)!==S.agreedKey){box.checked=false;S.agreedKey="";}
+  if(!S.sel){box.disabled=true;wrap.classList.add("off");txt.textContent="Select your spaces to see the price.";return;}
+  const n=S.sel.w*S.sel.h;
+  box.disabled=false;wrap.classList.remove("off");
+  txt.innerHTML="";
+  txt.append("I agree to pay ");
+  const b=document.createElement("b");b.textContent=gbp(n*PRICE);txt.append(b);
+  txt.append(` (${n} space${n>1?"s":""} × ${gbp(PRICE)}) for this reservation. My spaces are held once I reserve, and I'll pay the seller directly.`);
+}
+function renderMine(){
+  const mine=(S.orders[S.uid]?.placements)||[];
+  $("mine-wrap").hidden=!mine.length;
+  const ul=$("mine");ul.innerHTML="";
+  for(const p of mine){
+    const li=document.createElement("li");
+    const t=document.createElement("span");t.className="thumb";t.style.backgroundImage=`url("${imgUrl(p.asset)}")`;
+    const m=document.createElement("div");m.className="meta";
+    const n=document.createElement("div");n.textContent=p.name;
+    const s=document.createElement("div");s.className="mono";s.textContent=`${p.side==="front"?"Front":"Back"} ${rectLabel(p)} · ${p.w*p.h} space${p.w*p.h>1?"s":""} · ${gbp(p.w*p.h*PRICE)} owed`;
+    m.append(n,s);
+    const x=document.createElement("button");x.className="btn ghost";x.type="button";x.textContent="Remove";
+    x.onclick=()=>removePlacement(S.uid,p.id,x);
+    li.append(t,m,x);ul.appendChild(li);
+  }
+}
+function renderOwner(){
+  $("owner-wrap").hidden=!S.isOwner;
+  if(!S.isOwner) return;
+  const list=allPlacements().sort((a,b)=>(a.at||"").localeCompare(b.at||""));
+  const ul=$("orders");ul.innerHTML="";
+  if(!list.length){const li=document.createElement("li");li.className="hint";li.textContent="No reservations yet. They'll appear here as people book spaces.";ul.appendChild(li);return;}
+  let total=0;
+  for(const p of list){
+    total+=p.w*p.h;
+    const li=document.createElement("li");
+    const t=document.createElement("a");t.className="thumb";t.href=imgUrl(p.asset);t.target="_blank";t.rel="noopener";t.style.backgroundImage=`url("${imgUrl(p.asset)}")`;t.title="Open full-size photo";
+    const m=document.createElement("div");m.className="meta";
+    const n=document.createElement("div");n.textContent=p.name;
+    const s=document.createElement("div");s.className="mono";s.textContent=`${p.side==="front"?"Front":"Back"} ${rectLabel(p)} · ${p.w*p.h} sp · ${gbp(p.w*p.h*PRICE)}${p.agreedToPay?" agreed":""} · ${p.at?new Date(p.at).toLocaleDateString():""}`;
+    m.append(n,s);
+    const x=document.createElement("button");x.className="btn ghost";x.type="button";x.textContent="Remove";
+    x.onclick=()=>removePlacement(p.uid,p.id,x);
+    li.append(t,m,x);ul.appendChild(li);
+  }
+  const li=document.createElement("li");li.className="mono";li.textContent=`${list.length} photo${list.length>1?"s":""} · ${total} of 96 spaces sold · ${gbp(total*PRICE)} owed in total`;ul.appendChild(li);
+}
+function validate(){
+  const name=$("fullname").value.trim();
+  const fullOk=/\S+\s+\S+/.test(name);
+  const selOk=S.sel&&!clashes(S.sel,S.sel.side,allPlacements());
+  const agreeOk=$("agree").checked&&S.agreedKey===selKey(S.sel);
+  $("submit").disabled=S.busy||!S.db||!selOk||!S.file||!fullOk||!agreeOk;
+  if(S.sel&&!S.busy) $("submit").textContent="Reserve for "+gbp(S.sel.w*S.sel.h*PRICE); else if(!S.sel) $("submit").textContent="Reserve spaces";
+  if(!S.busy){
+    const m=$("msg");
+    if(m.dataset.sticky) return;
+    m.className="msg";
+    if(!S.db) m.textContent="";
+    else if(!S.sel) m.textContent="Pick your spaces on the shirt to start.";
+    else if(!selOk) m.textContent="That rectangle covers a taken space. Pick free squares only.";
+    else if(!S.file) m.textContent="Now add your photo.";
+    else if(!fullOk) m.textContent="Enter your full name (first and last).";
+    else if(!agreeOk) m.textContent="Tick the box to agree to the price.";
+    else m.textContent="Ready to reserve.";
+  }
+}
+function say(text,kind,sticky){const m=$("msg");m.textContent=text;m.className="msg"+(kind?" "+kind:"");if(sticky)m.dataset.sticky="1";else delete m.dataset.sticky;}
+
+/* ---------- selection ---------- */
+function cellAt(x,y){
+  const g=grid.getBoundingClientRect();
+  const c=Math.floor((x-g.left)/g.width*COLS), r=Math.floor((y-g.top)/g.height*ROWS);
+  return {c:Math.max(0,Math.min(COLS-1,c)),r:Math.max(0,Math.min(ROWS-1,r))};
+}
+grid.addEventListener("pointerdown",e=>{
+  if(e.button!==0) return;
+  const p=cellAt(e.clientX,e.clientY);
+  delete $("msg").dataset.sticky;
+  if(e.shiftKey&&S.anchor&&S.sel?.side===S.side){S.sel={...rectFrom(S.anchor,p),side:S.side};}
+  else {S.anchor=p;S.sel={...p,w:1,h:1,side:S.side};}
+  S.dragging=true;grid.setPointerCapture(e.pointerId);render();
+});
+grid.addEventListener("pointermove",e=>{
+  if(!S.dragging) return;
+  const p=cellAt(e.clientX,e.clientY);
+  const n={...rectFrom(S.anchor,p),side:S.side};
+  if(!S.sel||n.c!==S.sel.c||n.r!==S.sel.r||n.w!==S.sel.w||n.h!==S.sel.h){S.sel=n;render();}
+});
+const endDrag=()=>{S.dragging=false;};
+grid.addEventListener("pointerup",endDrag);grid.addEventListener("pointercancel",endDrag);
+grid.addEventListener("keydown",e=>{
+  const b=e.target.closest(".cell");if(!b) return;
+  const p={c:+b.dataset.c,r:+b.dataset.r};
+  if(e.key==="Enter"||e.key===" "){
+    e.preventDefault();
+    if(e.shiftKey&&S.anchor) S.sel={...rectFrom(S.anchor,p),side:S.side};
+    else {S.anchor=p;S.sel={...p,w:1,h:1,side:S.side};}
+    render();grid.querySelector(`.cell[data-c="${p.c}"][data-r="${p.r}"]`)?.focus();
+  }
+});
+document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>{S.side=b.dataset.side;S.anchor=null;if(S.sel&&S.sel.side!==S.side)S.sel=null;render();});
+
+/* ---------- photo ---------- */
+function setFile(f){
+  if(!f) return;
+  if(!/^image\//.test(f.type)){say("That file isn't an image. Choose a JPG, PNG or WebP.","err",true);return;}
+  if(f.size>20*1024*1024){say("That photo is over 20 MB. Choose a smaller file.","err",true);return;}
+  if(S.fileUrl) URL.revokeObjectURL(S.fileUrl);
+  S.file=f;S.fileUrl=URL.createObjectURL(f);
+  $("thumb").style.backgroundImage=`url("${S.fileUrl}")`;
+  $("drop-title").textContent="Photo added";
+  $("drop-sub").textContent=f.name+" · "+(f.size/1048576).toFixed(1)+" MB · tap to change";
+  delete $("msg").dataset.sticky;render();
+}
+$("photo").addEventListener("change",e=>setFile(e.target.files[0]));
+const drop=$("drop");
+["dragenter","dragover"].forEach(t=>drop.addEventListener(t,e=>{e.preventDefault();drop.classList.add("over");}));
+["dragleave","drop"].forEach(t=>drop.addEventListener(t,e=>{e.preventDefault();drop.classList.remove("over");}));
+drop.addEventListener("drop",e=>setFile(e.dataTransfer.files[0]));
+$("fullname").addEventListener("input",()=>{delete $("msg").dataset.sticky;validate();});
+$("agree").addEventListener("change",e=>{S.agreedKey=e.target.checked?selKey(S.sel):"";delete $("msg").dataset.sticky;validate();});
+
+/* ---------- saving ---------- */
+async function submit(){
+  if($("submit").disabled) return;
+  const name=$("fullname").value.trim().replace(/\s+/g," ");
+  const sel={...S.sel};
+  const amount=sel.w*sel.h*PRICE;
+  const terms=$("agree-text").textContent;
+  S.busy=true;validate();say("Checking the spaces are still free…");
+  try{
+    const snap=await S.db.collection("orders").get();
+    const fresh={};snap.docs.forEach(d=>fresh[d.id]=d.data()||{});
+    const freshList=[];for(const [u,d] of Object.entries(fresh)) for(const p of (d.placements||[])) freshList.push(p);
+    if(clashes(sel,sel.side,freshList)){S.orders=fresh;S.busy=false;render();say("Someone just took one of those spaces. Pick another rectangle.","err",true);return;}
+    say("Uploading your photo…");
+    const up=await S.assets.upload(S.file);
+    const mine=fresh[S.uid]?.placements||[];
+    const placement={id:Math.random().toString(36).slice(2,10),side:sel.side,c:sel.c,r:sel.r,w:sel.w,h:sel.h,asset:up.id,name,at:new Date().toISOString(),amountGBP:amount,agreedToPay:true,agreedTerms:terms};
+    await S.db.doc("orders/"+S.uid).set({placements:[...mine,placement]});
+    S.sel=null;S.anchor=null;S.file=null;
+    if(S.fileUrl) URL.revokeObjectURL(S.fileUrl);S.fileUrl=null;
+    $("photo").value="";$("thumb").style.backgroundImage="";$("drop-title").textContent="Choose a photo";$("drop-sub").textContent="or drop it here";
+    S.busy=false;render();
+    $("agree").checked=false;S.agreedKey="";render();
+    say(`Reserved ${placement.side} ${rectLabel(placement)} for ${name}. You've agreed to pay ${gbp(amount)}.`,"ok",true);
+  }catch(err){
+    S.busy=false;validate();
+    const code=err&&err.code;
+    const txt=code==="too_large"?"That photo is too large to upload. Try one under 20 MB."
+      :code==="unsupported_type"?"That image type can't be uploaded. Try a JPG or PNG."
+      :code==="not_granted"||code==="not_uploader"?"You don't have permission to reserve spaces on this page. Ask the seller for access."
+      :code==="rate_limited"?"Too many uploads at once. Wait a moment and try again."
+      :"The reservation didn't save. Check your connection and try again.";
+    say(txt,"err",true);
+  }
+}
+$("submit").onclick=submit;
+
+async function removePlacement(uid,pid,btn){
+  if(btn.dataset.confirm!=="1"){btn.dataset.confirm="1";btn.textContent="Confirm";setTimeout(()=>{if(btn.isConnected){btn.dataset.confirm="";btn.textContent="Remove";}},3000);return;}
+  btn.disabled=true;
+  try{
+    const doc=S.db.doc("orders/"+uid);
+    const cur=(await doc.get()).data()||{};
+    await doc.set({placements:(cur.placements||[]).filter(p=>p.id!==pid)});
+    say("Reservation removed. Those spaces are free again.","ok",true);
+  }catch(e){btn.disabled=false;say("Couldn't remove that reservation. Try again.","err",true);}
+}
+
+/* ---------- boot ---------- */
+buildCells();render();
+(async()=>{
+  const banner=$("banner");
+  const timer=setTimeout(()=>{if(!S.db){banner.hidden=false;banner.textContent="Still connecting to the booking list…";}},10000);
+  const use=n=>window.claude?.use?window.claude.use(n).catch(()=>null):Promise.resolve(null);
+  const [db,assets,user]=await Promise.all([use("db"),use("assets"),use("user")]);
+  if(!db||!user){clearTimeout(timer);banner.hidden=false;banner.textContent="Sign in to claude.ai to reserve spaces. You can still look around and plan your rectangle.";return;}
+  S.uid=await user.id();
+  S.isOwner=await user.isOwner();
+  S.assets=assets;
+  if(!assets){banner.hidden=false;banner.textContent="You can view the shirt, but your access doesn't allow photo uploads. Ask the seller for “can interact” access.";}
+  db.collection("orders").onSnapshot(snap=>{
+    clearTimeout(timer);
+    if(assets) banner.hidden=true;
+    const o={};snap.docs.forEach(d=>o[d.id]=d.data()||{});
+    S.orders=o;
+    if(!S.db&&assets) S.db=db;
+    render();
+  },err=>{clearTimeout(timer);banner.hidden=false;banner.textContent="Couldn't load reservations right now. Reload the page to try again.";});
+})();
+</script>
+
+</body></html>
