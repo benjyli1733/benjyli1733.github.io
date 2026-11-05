@@ -15,6 +15,8 @@
   --display:"Archivo","Arial Black",system-ui,sans-serif;
   --body:"Instrument Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
   --mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+  /* on-screen golden tint for the black and white photos (the uploaded files stay neutral) */
+  --gold:grayscale(1) sepia(.45) saturate(1.5) hue-rotate(6deg) brightness(1.03);
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --bg:#0f131c; --surface:#171c28; --fg:#e9ecf3; --muted:#9aa3b8; --line:#2a3142;
@@ -55,11 +57,12 @@ header p{margin:8px 0 0;color:var(--muted);max-width:60ch}
 .cell:hover{border-color:rgba(255,255,255,.7)}
 .cell:focus-visible{outline:2px solid var(--sel);outline-offset:1px;z-index:3}
 .cell.taken{cursor:not-allowed;background:repeating-linear-gradient(45deg,rgba(255,255,255,.08) 0 4px,transparent 4px 8px),var(--print)}
-.photo{z-index:1;border-radius:2px;overflow:hidden;pointer-events:none;background:#c8ccd6 center/cover no-repeat;box-shadow:0 0 0 1px rgba(0,0,0,.25);filter:grayscale(1)}
+.photo{z-index:1;border-radius:2px;overflow:hidden;pointer-events:none;background:#c8ccd6 center/cover no-repeat;box-shadow:0 0 0 1px rgba(0,0,0,.25);filter:var(--gold)}
 .photo.mine{box-shadow:0 0 0 2px var(--sel)}
 .sel{z-index:2;pointer-events:none;border:2px solid var(--sel);background:rgba(255,210,63,.28) center/cover no-repeat;border-radius:2px}
 .sel.bad{border-color:var(--bad);background-color:rgba(229,72,77,.35)}
-.sel.has-img{background-color:transparent}
+.sel.has-img{background-color:transparent;filter:var(--gold)}
+#thumb[style*="url("],.editor canvas{filter:var(--gold)}
 
 .legend{display:flex;flex-wrap:wrap;gap:10px 28px;justify-content:center;font-size:16px;color:var(--fg)}
 .legend span{display:inline-flex;align-items:center;gap:8px}
