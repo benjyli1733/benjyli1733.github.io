@@ -16,7 +16,7 @@
   --body:"Instrument Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
   --mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
   /* on-screen golden tint for the black and white photos (the uploaded files stay neutral) */
-  --gold:grayscale(1) sepia(.45) saturate(1.5) hue-rotate(6deg) brightness(1.03);
+  --gold:url(#gold-tone);
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --bg:#0f131c; --surface:#171c28; --fg:#e9ecf3; --muted:#9aa3b8; --line:#2a3142;
@@ -119,6 +119,17 @@ input[type=text]:focus-visible{outline:2px solid var(--shirt);outline-offset:1px
 <style>body{margin:0} img{max-width:100%} [hidden]{display:none!important}</style>
 </head>
 <body>
+<!-- gold duotone: shadows near-black, midtones #A57C00, highlights warm cream -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <filter id="gold-tone" color-interpolation-filters="sRGB">
+    <feColorMatrix type="saturate" values="0"/>
+    <feComponentTransfer>
+      <feFuncR type="table" tableValues="0.06 0.647 1"/>
+      <feFuncG type="table" tableValues="0.04 0.486 0.93"/>
+      <feFuncB type="table" tableValues="0 0 0.72"/>
+    </feComponentTransfer>
+  </filter>
+</svg>
 <div class="wrap">
   <header>
     <h1>Get your photo on the shirt</h1>
